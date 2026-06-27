@@ -1,21 +1,10 @@
-Archive:  P106_現在要去哪裡.zip
-  Length      Date    Time    Name
----------  ---------- -----   ----
-        0  2026-06-27 09:40   P106_現在要去哪裡/
-        0  2026-06-27 09:38   P106_現在要去哪裡/css/
-     5778  2026-06-27 09:38   P106_現在要去哪裡/css/style.css
-        0  2026-06-27 09:39   P106_現在要去哪裡/js/
-    17574  2026-06-27 09:40   P106_現在要去哪裡/js/app.js
-        0  2026-06-27 09:39   P106_現在要去哪裡/sql/
-     8569  2026-06-27 09:39   P106_現在要去哪裡/sql/P106_schema.sql
-        0  2026-06-27 09:37   P106_現在要去哪裡/functions/
-        0  2026-06-27 09:39   P106_現在要去哪裡/functions/P106AnalyzeInput/
-     4215  2026-06-27 09:39   P106_現在要去哪裡/functions/P106AnalyzeInput/index.ts
-        0  2026-06-27 09:40   P106_現在要去哪裡/docs/
-     3409  2026-06-27 09:40   P106_現在要去哪裡/docs/DEPLOYMENT.md
-        0  2026-06-27 09:37   P106_現在要去哪裡/assets/
-     9947  2026-06-27 09:37   P106_現在要去哪裡/index.html
-      364  2026-06-27 09:37   P106_現在要去哪裡/config.sample.js
-     3953  2026-06-27 09:40   P106_現在要去哪裡/README.md
----------                     -------
-    53809                     16 files
+P106_NowWhere/CHANGELOG.md 366 bytes
+P106_NowWhere/FILE_MANIFEST.txt 0 bytes
+P106_NowWhere/README.md 3953 bytes
+P106_NowWhere/config.sample.js 364 bytes
+P106_NowWhere/css/style.css 5778 bytes
+P106_NowWhere/docs/DEPLOYMENT.md 3409 bytes
+P106_NowWhere/functions/P106AnalyzeInput/index.ts 4215 bytes
+P106_NowWhere/index.html 9947 bytes
+P106_NowWhere/js/app.js 17962 bytes
+P106_NowWhere/sql/P106_schema.sql 8569 bytes

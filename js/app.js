@@ -273,15 +273,68 @@
 
   function bindEvents() {
     $$('.nav-btn').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
-    $('#nowForm').addEventListener('submit', e => { e.preventDefault(); renderCards($('#nowResults'), queryNow(formData(e.currentTarget)), '沒有符合條件的喚回結果。可以放寬地區、時間或同行者條件。'); });
+    $('#nowForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const form = e.currentTarget;
+      renderCards($('#nowResults'), queryNow(formData(form)), '沒有符合條件的喚回結果。可以放寬地區、時間或同行者條件。');
+    });
     $('#clearNow').addEventListener('click', () => { $('#nowForm').reset(); $('#nowResults').innerHTML = ''; });
-    $('#quickForm').addEventListener('submit', async e => { e.preventDefault(); try { await savePlace(formData(e.currentTarget)); e.currentTarget.reset(); toast('已快速儲存'); setView('library'); } catch(err) { toast(`儲存失敗：${err.message}`); } });
-    $('#aiForm').addEventListener('submit', async e => { e.preventDefault(); try { toast('正在產生欄位建議'); const input = formData(e.currentTarget); const data = await analyzeInput(input); const f = $('#aiConfirmForm'); f.classList.remove('hidden'); Object.entries(data).forEach(([k,v]) => { const el = f.elements[k]; if (el) el.value = Array.isArray(v) ? v.join('、') : (v || ''); }); f.dataset.sourceUrl = input.source_url || ''; f.dataset.sourceText = input.source_text || ''; f.dataset.aiJson = JSON.stringify(data); toast('已產生建議，請確認後儲存'); } catch(err) { toast(`AI 分析失敗：${err.message}`); } });
-    $('#aiConfirmForm').addEventListener('submit', async e => { e.preventDefault(); try { const data = formData(e.currentTarget); data.source_url = e.currentTarget.dataset.sourceUrl; data.source_text = e.currentTarget.dataset.sourceText; data.ai_suggested_json = JSON.parse(e.currentTarget.dataset.aiJson || '{}'); await savePlace(data); e.currentTarget.reset(); e.currentTarget.classList.add('hidden'); toast('已儲存 AI 建議資料'); setView('library'); } catch(err) { toast(`儲存失敗：${err.message}`); } });
+    $('#quickForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const form = e.currentTarget;
+      try {
+        await savePlace(formData(form));
+        form.reset();
+        toast('已快速儲存');
+        setView('library');
+      } catch(err) { toast(`儲存失敗：${err.message}`); }
+    });
+    $('#aiForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const form = e.currentTarget;
+      try {
+        toast('正在產生欄位建議');
+        const input = formData(form);
+        const data = await analyzeInput(input);
+        const f = $('#aiConfirmForm');
+        f.classList.remove('hidden');
+        Object.entries(data).forEach(([k,v]) => {
+          const el = f.elements[k];
+          if (el) el.value = Array.isArray(v) ? v.join('、') : (v || '');
+        });
+        f.dataset.sourceUrl = input.source_url || '';
+        f.dataset.sourceText = input.source_text || '';
+        f.dataset.aiJson = JSON.stringify(data);
+        toast('已產生建議，請確認後儲存');
+      } catch(err) { toast(`AI 分析失敗：${err.message}`); }
+    });
+    $('#aiConfirmForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const form = e.currentTarget;
+      try {
+        const data = formData(form);
+        data.source_url = form.dataset.sourceUrl;
+        data.source_text = form.dataset.sourceText;
+        data.ai_suggested_json = JSON.parse(form.dataset.aiJson || '{}');
+        await savePlace(data);
+        form.reset();
+        form.classList.add('hidden');
+        toast('已儲存 AI 建議資料');
+        setView('library');
+      } catch(err) { toast(`儲存失敗：${err.message}`); }
+    });
     $('#discardAi').addEventListener('click', () => $('#aiConfirmForm').classList.add('hidden'));
     $('#librarySearch').addEventListener('input', renderLibrary); $('#libraryStatus').addEventListener('change', renderLibrary); $('#refreshLibrary').addEventListener('click', loadData);
     document.body.addEventListener('click', e => { const detail = e.target.closest('[data-detail]'); const del = e.target.closest('[data-delete]'); if (detail) showDetail(detail.dataset.detail); if (del) deletePlace(del.dataset.delete); });
-    $('#companionForm').addEventListener('submit', async e => { e.preventDefault(); try { await saveCompanion(formData(e.currentTarget)); e.currentTarget.reset(); toast('已新增同行者'); } catch(err) { toast(`新增失敗：${err.message}`); } });
+    $('#companionForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const form = e.currentTarget;
+      try {
+        await saveCompanion(formData(form));
+        form.reset();
+        toast('已新增同行者');
+      } catch(err) { toast(`新增失敗：${err.message}`); }
+    });
     $('#exportJson').addEventListener('click', () => { const blob = new Blob([JSON.stringify({ places: state.places, companions: state.companions }, null, 2)], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `P106_export_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(a.href); });
   }
 
