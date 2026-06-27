@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>P106 現在要去哪裡｜Personal Experience Retrieval System</title>
+  <meta name="description" content="P106 現在要去哪裡：協助喚回曾經想去之地點的情境檢索系統。" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-block">
+      <div class="project-code">P106</div>
+      <div>
+        <h1>現在要去哪裡</h1>
+        <p>Personal Experience Retrieval System｜情境式生活經驗喚回系統</p>
+      </div>
+    </div>
+    <div class="system-status" id="systemStatus">讀取中</div>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar" aria-label="主要導覽">
+      <button class="nav-btn active" data-view="now">現在要去哪裡</button>
+      <button class="nav-btn" data-view="quick">快速記一下</button>
+      <button class="nav-btn" data-view="ai">AI 幫我整理</button>
+      <button class="nav-btn" data-view="library">我的收藏</button>
+      <button class="nav-btn" data-view="pending">待整理</button>
+      <button class="nav-btn" data-view="companions">同行者</button>
+      <button class="nav-btn" data-view="settings">設定</button>
+    </aside>
+
+    <section class="content">
+      <section class="hero-card">
+        <div>
+          <p class="eyebrow">不是找熱門地點，而是喚回曾經心動的地方</p>
+          <h2 id="viewTitle">現在要去哪裡</h2>
+          <p id="viewSubtitle">輸入當下情境，從自己與小群體的生活記憶中找出合適候選。</p>
+        </div>
+        <div class="hero-mark">今</div>
+      </section>
+
+      <section id="view-now" class="view active">
+        <form id="nowForm" class="panel grid-form">
+          <label>我現在在哪裡
+            <input name="area" placeholder="例如：花蓮市、台11線、台東、中山區" />
+          </label>
+          <label>我有多少時間
+            <select name="time_budget">
+              <option value="">不限</option>
+              <option>30分鐘</option><option>1小時</option><option>3小時</option><option>半天</option><option>一天</option>
+            </select>
+          </label>
+          <label>我跟誰一起
+            <input name="companions" placeholder="例如：自己、家人、A、外賓" />
+          </label>
+          <label>現在想做什麼
+            <select name="intent">
+              <option value="">不限</option>
+              <option>吃飯</option><option>喝咖啡</option><option>散步</option><option>看海</option><option>拍照</option><option>展覽</option><option>伴手禮</option>
+            </select>
+          </label>
+          <label>條件限制
+            <input name="constraints" placeholder="例如：要停車、不排隊、雨天、不太貴" />
+          </label>
+          <label>排序方式
+            <select name="sort_by">
+              <option value="match">符合情境</option>
+              <option value="desire">最想去</option>
+              <option value="recent">最近加入</option>
+              <option value="rating">評分</option>
+            </select>
+          </label>
+          <div class="form-actions full">
+            <button type="submit" class="primary">現在要去哪裡？</button>
+            <button type="button" id="clearNow" class="secondary">清除條件</button>
+          </div>
+        </form>
+        <div id="nowResults" class="cards"></div>
+      </section>
+
+      <section id="view-quick" class="view">
+        <form id="quickForm" class="panel grid-form">
+          <label>地點名稱
+            <input name="name" required placeholder="例如：某某咖啡、200K附近海灘" />
+          </label>
+          <label>地區／路線
+            <input name="area" placeholder="例如：花蓮市、台11線、台東" />
+          </label>
+          <label>類型
+            <select name="place_type">
+              <option>吃</option><option>喝</option><option>走走</option><option>景點</option><option>展覽</option><option>活動</option><option>伴手禮</option><option>其他</option>
+            </select>
+          </label>
+          <label>誰提過
+            <input name="mentioned_by" placeholder="例如：自己、A、家人、網路文章" />
+          </label>
+          <label>為什麼想去
+            <textarea name="intent_note" placeholder="例如：朋友說甜點很好、下次到附近可順路、適合看海"></textarea>
+          </label>
+          <label>什麼時候要想起它
+            <textarea name="trigger_note" placeholder="例如：到台11線、有三小時、帶外賓、雨天備案"></textarea>
+          </label>
+          <label>來源網址
+            <input name="source_url" placeholder="https://..." />
+          </label>
+          <label>狀態
+            <select name="status">
+              <option>未去</option><option>已去</option><option>想再去</option><option>待確認</option><option>不推薦</option>
+            </select>
+          </label>
+          <div class="form-actions full">
+            <button type="submit" class="primary">快速儲存</button>
+            <button type="reset" class="secondary">清空</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="view-ai" class="view">
+        <div class="panel">
+          <h3>AI 欄位建議</h3>
+          <p class="muted">貼上部落格文字、朋友訊息或網址。AI 只產生欄位建議，儲存前仍需人工確認。</p>
+          <form id="aiForm" class="stack-form">
+            <label>來源網址，可選
+              <input name="source_url" placeholder="貼網址；若讀取失敗，請改貼文字" />
+            </label>
+            <label>介紹文字／推薦文字
+              <textarea name="source_text" rows="8" placeholder="建議直接貼文字，成功率高於只貼網址。"></textarea>
+            </label>
+            <button type="submit" class="primary">產生欄位建議</button>
+          </form>
+        </div>
+        <form id="aiConfirmForm" class="panel grid-form hidden">
+          <h3 class="full">儲存前確認</h3>
+          <label>地點名稱<input name="name" required /></label>
+          <label>地區／路線<input name="area" /></label>
+          <label>類型<input name="place_type" /></label>
+          <label>誰提過<input name="mentioned_by" /></label>
+          <label>時間條件<input name="time_tags" /></label>
+          <label>情境標籤<input name="context_tags" /></label>
+          <label>預算<input name="budget_level" /></label>
+          <label>氣氛<input name="mood_tags" /></label>
+          <label>停車<input name="parking_note" /></label>
+          <label>預約<input name="reservation_note" /></label>
+          <label class="full">AI 摘要<textarea name="ai_summary"></textarea></label>
+          <label class="full">喚回條件<textarea name="trigger_note"></textarea></label>
+          <label class="full">備註<textarea name="intent_note"></textarea></label>
+          <div class="form-actions full">
+            <button type="submit" class="primary">確認儲存</button>
+            <button type="button" id="discardAi" class="secondary">放棄建議</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="view-library" class="view">
+        <div class="panel filter-row">
+          <input id="librarySearch" placeholder="搜尋名稱、地區、標籤、備註" />
+          <select id="libraryStatus"><option value="">全部狀態</option><option>未去</option><option>已去</option><option>想再去</option><option>待確認</option><option>不推薦</option></select>
+          <button id="refreshLibrary" class="secondary">重新整理</button>
+        </div>
+        <div id="libraryList" class="cards"></div>
+      </section>
+
+      <section id="view-pending" class="view">
+        <div class="panel">
+          <h3>待整理資料</h3>
+          <p class="muted">快速記下但欄位不足的資料會出現在這裡。請補上地區、喚回條件或個人感受。</p>
+        </div>
+        <div id="pendingList" class="cards"></div>
+      </section>
+
+      <section id="view-companions" class="view">
+        <form id="companionForm" class="panel grid-form">
+          <label>同行者名稱<input name="name" required placeholder="例如：A、家人、外賓、學生" /></label>
+          <label>關係／群組<input name="relation" placeholder="例如：親友、學生、實驗室" /></label>
+          <label class="full">偏好與限制<textarea name="preference_note" placeholder="例如：喜歡看海、不喜歡排隊、不吃辣"></textarea></label>
+          <div class="form-actions full"><button class="primary">新增同行者</button></div>
+        </form>
+        <div id="companionList" class="cards"></div>
+      </section>
+
+      <section id="view-settings" class="view">
+        <div class="panel">
+          <h3>系統設定</h3>
+          <p><strong>Supabase 狀態：</strong><span id="settingsStatus">檢查中</span></p>
+          <p class="muted">請複製 <code>config.sample.js</code> 為 <code>config.js</code>，填入 Supabase URL 與 anon key。若未設定，系統會以瀏覽器 localStorage 示範模式運作。</p>
+          <button id="exportJson" class="secondary">匯出目前資料 JSON</button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <dialog id="detailDialog">
+    <div id="detailContent"></div>
+    <form method="dialog"><button class="secondary">關閉</button></form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
