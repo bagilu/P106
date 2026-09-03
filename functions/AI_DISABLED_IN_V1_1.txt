@@ -1,0 +1,4 @@
+P106 V1.1 暫停 AI 功能。
+
+本版不需要 Supabase Edge Function，也不需要 OPENAI_API_KEY。
+未來若恢復 AI 功能，請建立新的 Edge Function，並要求登入者 JWT 驗證後才能呼叫。

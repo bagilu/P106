@@ -1,139 +1,144 @@
-# P106 現在要去哪裡
+# P106 現在要去哪裡｜NowWhere V1.1 Auth Personal Edition
 
-**英文標題：** Personal Experience Retrieval System  
-**系統定位：** 情境式生活經驗喚回系統  
-**技術架構：** GitHub Pages 靜態網站 + Supabase 資料庫 + 可選 Supabase Edge Function AI 欄位建議
+## 1. 專案定位
 
----
+P106「現在要去哪裡」是個人化生活經驗喚回系統（Personal Experience Retrieval System）。它的核心不是取代 Google Maps，也不是大眾推薦平台，而是協助使用者在「現在要決定去哪裡」時，喚回自己曾經看過、聽過、心動過、親友提過、但平常容易忘記的吃喝玩樂地點。
 
-## 1. 專案核心
+本版已由無登入原型升級為登入個人版。每位使用者使用 Email + Password 登入後，只能讀寫自己的地點、感受、同行者與今日候選。
 
-P106 的問題不是「不知道哪裡好玩」，而是：平常曾經看到、聽到、想到很多想去的地方，但真正到了吃飯、旅行、有空檔或跟親友出門時，卻想不起來。
+## 2. 版本資訊
 
-因此本系統的核心不是大眾推薦，而是：
+- 專案編號：P106
+- 中文名稱：現在要去哪裡
+- 英文標題：NowWhere / Personal Experience Retrieval System
+- 版本：V1.1 Auth Personal Edition
+- 前端：GitHub Pages 靜態網站
+- 後端：Supabase Database + Supabase Auth
+- AI：本版暫停 AI 功能，不需要 OpenAI API key
+- ZIP 命名：ASCII safe，避免中文 ZIP 檔名造成解壓縮異常
 
-> 把自己與小群體曾經心動、提過、想去、順路可去的地方，在適合情境中重新喚回。
+## 3. 風格
 
----
+本版採「日式文青系 × 台灣公共服務風」：
 
-## 2. 主要使用情境
+- 米白、綠、灰藍等柔和色系
+- 卡片式資訊呈現
+- 介面語言偏生活化
+- 功能結構偏公共服務清楚導引
+- 不使用過度科技感或遊戲化視覺
 
-1. 平常看到餐廳、景點、活動時，快速記下來。
-2. 聽到親友提過某地點時，記錄「誰提過」。
-3. 之後人在某個地區、有三小時空檔、或正在規劃路線時，系統協助喚回以前收藏過的候選地點。
-4. 選定後可再開啟 Google Maps 確認路線、營業時間與即時資訊。
+## 4. 核心功能
 
----
+### 4.1 Email + Password 登入
 
-## 3. 視覺風格
+- 註冊帳號
+- 登入
+- 登出
+- 顯示目前登入者 email
+- 未登入時無法使用主要功能
 
-本版採用「日式文青系」與「台灣公共服務風」混合：
+### 4.2 現在要去哪裡
 
-- 日式文青：米白紙感、淡雅色塊、柔和留白。
-- 台灣公共服務：清楚導覽、穩重藍綠、表單與資訊卡明確。
+使用者可輸入：
 
----
+- 目前地區
+- 可用時間
+- 同行者
+- 想做的活動
+- 限制條件
 
-## 4. 系統介面
+系統會從使用者自己的收藏中找出符合情境的候選地點。
 
-### 4.1 現在要去哪裡
+### 4.3 快速記一下
 
-輸入目前情境：
-
-- 我現在在哪裡
-- 我有多少時間
-- 我跟誰一起
-- 現在想做什麼
-- 條件限制
-
-系統從資料庫喚回可能合適的地點，並顯示「為什麼出現」。
-
-### 4.2 快速記一下
-
-平常看到或聽到某個地點時，快速輸入：
+平常看到或聽到某個想去的地方時，可快速記錄：
 
 - 地點名稱
-- 地區／路線
+- 地區
+- 路線／地理觸發
 - 類型
-- 誰提過
-- 為什麼想去
-- 什麼時候要想起它
-- 來源網址
 - 狀態
-
-### 4.3 AI 幫我整理
-
-可貼上部落格文字、朋友訊息或網址。系統呼叫 Supabase Edge Function `P106AnalyzeInput` 產生欄位建議。使用者修改確認後才儲存。
-
-若未部署 Edge Function，前端仍可用示範模式產生簡易欄位建議。
+- 意願
+- 誰提過
+- 適合時間
+- 什麼時候要想起它
+- 個人備註
+- Google Maps 連結
+- 來源網址
+- 預算、氣氛、停車、預約等輔助資訊
 
 ### 4.4 我的收藏
 
-查看所有收藏，支援關鍵字與狀態篩選。
+- 搜尋自己的收藏
+- 依狀態篩選
+- 查看地點卡片
+- 編輯收藏
+- 刪除收藏
+- 加入今日候選
+- 開啟 Google Maps
 
 ### 4.5 待整理
 
-顯示欄位不完整的資料，例如缺少地區、缺少喚回條件或缺少備註。
+顯示資料不完整的收藏，例如缺少：
 
-### 4.6 同行者
+- 地區
+- 觸發條件
+- 個人備註
 
-記錄親友、學生、外賓等偏好與限制，未來可用於更精準的情境喚回。
+### 4.6 同行者／親友偏好
 
----
+可建立：
 
-## 5. 資料表
+- 家人
+- 朋友
+- 學生
+- 外賓
+- 其他同行者
 
-所有資料表依老師指定，以 `TblP106` 開頭：
+並記錄喜好與避免條件，例如看海、甜點、不想排隊、不喜歡太吵。
 
-| 資料表 | 用途 |
-|---|---|
-| `TblP106Places` | 共同地點主檔 |
-| `TblP106UserPlaceNotes` | 個人感受、喚回條件、情境標籤 |
-| `TblP106Sources` | 來源網址、來源文字、AI 摘要與建議 JSON |
-| `TblP106Companions` | 同行者偏好與限制 |
-| `TblP106TodayCandidates` | 今日候選清單，預留後續使用 |
+## 5. 資料分層設計
 
----
+本版採「個人地點庫」方案。
 
-## 6. Function
+原本的共同地點概念保留在 `TblP106Places` 這張主表，但每筆地點都加上 `UserId`，因此實際上是每個人的個人地點庫。這可避免不同使用者對同一地點的感受互相污染。
 
-依指定命名，Function 以 `P106` 開頭：
+## 6. 主要資料表
 
-| Function | 類型 | 用途 |
-|---|---|---|
-| `P106AddPlace` | PostgreSQL function | 新增地點，供未來 RPC 使用 |
-| `P106SearchPlaces` | PostgreSQL function | 基礎情境查詢 |
-| `P106AnalyzeInput` | Supabase Edge Function | AI 欄位建議 |
+- `TblP106Places`：個人地點主檔與個人感受整合表
+- `TblP106Companions`：個人同行者／親友偏好
+- `TblP106Sources`：來源紀錄
+- `TblP106TodayCandidates`：今日候選清單
+- `TblP106UserPlaceNotes`：舊版相容用個人備註表；本版會清空舊個人感受資料
 
-Edge Function 不使用 CLI / npx deploy。本專案提供 `functions/P106AnalyzeInput/index.ts`，可在 Supabase Dashboard 手動建立並貼上。
+## 7. 安全性修正
 
----
+本版針對 Supabase linter 警告做以下修正：
 
-## 7. 檔案結構
+1. 移除 P106 舊有匿名全開 RLS policies。
+2. 不再建立 anon 可讀寫的 P106 資料表政策。
+3. P106 個人表改為 authenticated + `UserId = auth.uid()`。
+4. 移除舊版 `P106AddPlace` 與 `P106SearchPlaces` RPC function。
+5. `P106SetUpdatedAt` 使用 `SECURITY INVOKER` 並固定 `search_path`。
+6. 本版暫停 AI Edge Function，避免匿名消耗 AI API 額度。
 
-```text
-P106_現在要去哪裡/
-├── index.html
-├── config.sample.js
-├── css/
-│   └── style.css
-├── js/
-│   └── app.js
-├── sql/
-│   └── P106_schema.sql
-├── functions/
-│   └── P106AnalyzeInput/
-│       └── index.ts
-├── docs/
-│   └── DEPLOYMENT.md
-└── README.md
-```
+## 8. 部署檔案
 
----
+- `index.html`：主畫面
+- `css/style.css`：視覺樣式
+- `js/app.js`：前端邏輯
+- `config.sample.js`：Supabase 設定範本
+- `sql/P106_V1_1_Auth_Personal_schema.sql`：資料庫與 RLS SQL
+- `docs/DEPLOYMENT.md`：部署步驟
+- `docs/SECURITY_NOTES.md`：安全修正說明
+- `functions/AI_DISABLED_IN_V1_1.txt`：AI 暫停說明
+- `CHANGELOG.md`：版本變更紀錄
+- `FILE_MANIFEST.txt`：檔案清單
 
-## 8. 注意事項
+## 9. 重要限制
 
-1. ZIP 只提供 `config.sample.js`，不提供實際 `config.js`。
-2. 部署後請自行複製 `config.sample.js` 為 `config.js`。
-3. 教學展示版 RLS 允許 anon 讀寫，正式多人使用前應改成登入權限控管。
-4. AI 網址讀取可能受網站阻擋，貼上文字的成功率通常高於只貼網址。
+- 本版不含 AI 整理功能。
+- 本版不串接 Google Maps API，只保留 Google Maps URL。
+- 本版不做多人共享。
+- 本版不是公開推薦平台；資料以個人登入後私有使用為主。
+- 舊的 `TblP106Places` 資料若沒有 `UserId`，會被保留但不會被任何使用者看見，除非手動指定 owner。
