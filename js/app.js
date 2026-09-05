@@ -15,6 +15,8 @@ const DEFINITIONS = {
     ["B1600_3200","1600–3200"],["B3200_6400","3200–6400"],["B6400_12800","6400–12800"],["B12800_PLUS","12800以上"]
   ],
   atmospheres: [["LUXURY","奢華"],["ELEGANT","高雅"],["ARTSY","文青"],["SIMPLE","簡陋"],["LOUD","喧嘩"],["QUIET","安靜"]],
+  parkingLevels: [["CONVENIENT","方便"],["NORMAL","普通"],["INCONVENIENT","不方便"]],
+  stationDistances: [["NEAR","近"],["NORMAL","普通"],["FAR","遠"]],
   partySizes: [["ONE","1人"],["TWO","2人"],["THREE_FOUR","3–4人"],["FIVE_EIGHT","5–8人"],["NINE_PLUS","9人以上"]],
   timeSlots: [["05_08","清晨 05–08"],["08_11","上午 08–11"],["11_14","中午 11–14"],["14_17","下午 14–17"],["17_21","晚間 17–21"],["21_05","深夜 21–05"]]
 };
@@ -56,11 +58,6 @@ function labelsFor(values, defKey){
   return (values || []).map(v=>map[v] || v);
 }
 function countryLabel(code){ return Object.fromEntries(COUNTRIES)[code] || code || ""; }
-function nullableBoolean(value){
-  if(value === "true") return true;
-  if(value === "false") return false;
-  return null;
-}
 function selectedValues(containerId){
   return [...document.querySelectorAll(`#${containerId} input[type="checkbox"]:checked`)].map(x=>x.value);
 }
@@ -97,11 +94,15 @@ function setupStaticUI(){
   renderChoices("placeCategories","categories","placeCategories");
   renderChoices("placeBudgets","budgets","placeBudgets");
   renderChoices("placeAtmospheres","atmospheres","placeAtmospheres");
+  renderChoices("placeParkingLevels","parkingLevels","placeParkingLevels");
+  renderChoices("placeStationDistances","stationDistances","placeStationDistances");
   renderChoices("placePartySizes","partySizes","placePartySizes");
   renderChoices("placeTimeSlots","timeSlots","placeTimeSlots");
   renderChoices("searchCategories","categories","searchCategories");
   renderChoices("searchBudgets","budgets","searchBudgets");
   renderChoices("searchAtmospheres","atmospheres","searchAtmospheres");
+  renderChoices("searchParkingLevels","parkingLevels","searchParkingLevels");
+  renderChoices("searchStationDistances","stationDistances","searchStationDistances");
   renderChoices("searchPartySizes","partySizes","searchPartySizes");
   renderChoices("searchTimeSlots","timeSlots","searchTimeSlots");
   renderCountries("placeCountry"); renderCountries("searchCountry");
@@ -206,8 +207,8 @@ function placePayload(form){
     CountryCode:$("placeCountry").value,
     RegionText:currentRegionValue("place") || null,
     Atmospheres:selectedValues("placeAtmospheres"),
-    ParkingConvenient:nullableBoolean(data.ParkingConvenient),
-    NearStation:nullableBoolean(data.NearStation),
+    ParkingLevels:selectedValues("placeParkingLevels"),
+    StationDistanceLevels:selectedValues("placeStationDistances"),
     PartySizes:selectedValues("placePartySizes"),
     TimeSlotsV2:selectedValues("placeTimeSlots"),
     PersonalNote:String(data.PersonalNote||"").trim() || null,
@@ -239,6 +240,7 @@ function resetPlaceForm(){
   editingPlaceId=null; $("editingPlaceId").value="";
   $("placeCountry").value="TW"; updateRegionUI("place");
   setSelectedValues("placeCategories",[]); setSelectedValues("placeBudgets",[]); setSelectedValues("placeAtmospheres",[]);
+  setSelectedValues("placeParkingLevels",[]); setSelectedValues("placeStationDistances",[]);
   setSelectedValues("placePartySizes",[]); setSelectedValues("placeTimeSlots",[]);
   $("addPageTitle").textContent="新增地點"; $("savePlaceBtn").textContent="儲存地點"; $("cancelEditBtn").classList.add("hidden");
 }
@@ -248,10 +250,9 @@ function editPlace(placeId){
   const form=$("placeForm"); form.PlaceName.value=p.PlaceName||"";
   $("placeCountry").value=p.CountryCode||"TW"; updateRegionUI("place");
   if($("placeCountry").value==="OTHER") $("placeRegionText").value=p.RegionText||""; else $("placeRegion").value=p.RegionText||"";
-  form.ParkingConvenient.value=p.ParkingConvenient===true?"true":p.ParkingConvenient===false?"false":"";
-  form.NearStation.value=p.NearStation===true?"true":p.NearStation===false?"false":"";
   form.PersonalNote.value=p.PersonalNote||""; form.GoogleMapsUrl.value=p.GoogleMapsUrl||""; form.IsPublic.checked=!!p.IsPublic;
   setSelectedValues("placeCategories",p.Categories); setSelectedValues("placeBudgets",p.BudgetRanges); setSelectedValues("placeAtmospheres",p.Atmospheres);
+  setSelectedValues("placeParkingLevels",p.ParkingLevels); setSelectedValues("placeStationDistances",p.StationDistanceLevels);
   setSelectedValues("placePartySizes",p.PartySizes); setSelectedValues("placeTimeSlots",p.TimeSlotsV2);
   $("addPageTitle").textContent="編輯地點"; $("savePlaceBtn").textContent="儲存修改"; $("cancelEditBtn").classList.remove("hidden");
   activateTab("add"); window.scrollTo({top:0,behavior:"smooth"});
@@ -272,8 +273,8 @@ function searchCriteria(){
     country:$("searchCountry").value,
     region:currentRegionValue("search"),
     atmospheres:selectedValues("searchAtmospheres"),
-    parking:nullableBoolean(formData.ParkingConvenient),
-    station:nullableBoolean(formData.NearStation),
+    parkingLevels:selectedValues("searchParkingLevels"),
+    stationDistances:selectedValues("searchStationDistances"),
     party:selectedValues("searchPartySizes"),
     time:selectedValues("searchTimeSlots")
   };
@@ -290,8 +291,8 @@ function hardMatch(p,c){
 function preferenceScore(p,c){
   let score=0, possible=0, hits=[];
   if(c.atmospheres.length){ possible+=2; if(intersects(p.Atmospheres,c.atmospheres)){score+=2;hits.push("氣氛");} }
-  if(c.parking!==null){ possible+=2; if(p.ParkingConvenient===c.parking){score+=2;hits.push("停車");} }
-  if(c.station!==null){ possible+=2; if(p.NearStation===c.station){score+=2;hits.push("車站");} }
+  if(c.parkingLevels.length){ possible+=2; if(intersects(p.ParkingLevels,c.parkingLevels)){score+=2;hits.push("停車");} }
+  if(c.stationDistances.length){ possible+=2; if(intersects(p.StationDistanceLevels,c.stationDistances)){score+=2;hits.push("車站距離");} }
   if(c.party.length){ possible+=2; if(intersects(p.PartySizes,c.party)){score+=2;hits.push("人數");} }
   if(c.time.length){ possible+=2; if(intersects(p.TimeSlotsV2,c.time)){score+=2;hits.push("時段");} }
   return {score,possible,hits};
@@ -309,7 +310,7 @@ async function doSearch(e){
 }
 function clearSearch(){
   $("searchForm").reset(); $("searchCountry").value="TW"; updateRegionUI("search");
-  ["searchCategories","searchBudgets","searchAtmospheres","searchPartySizes","searchTimeSlots"].forEach(id=>setSelectedValues(id,[]));
+  ["searchCategories","searchBudgets","searchAtmospheres","searchParkingLevels","searchStationDistances","searchPartySizes","searchTimeSlots"].forEach(id=>setSelectedValues(id,[]));
   doSearch();
 }
 function selectCurrentTimeSlot(){
@@ -347,10 +348,11 @@ function renderPlaces(rows,targetId,options={}){
     badge.classList.add(options.publicMode||p.IsPublic?"public":"private");
     const chipValues=[
       ...labelsFor(p.Categories,"categories"),...labelsFor(p.BudgetRanges,"budgets"),
-      ...labelsFor(p.Atmospheres,"atmospheres"),...labelsFor(p.PartySizes,"partySizes"),...labelsFor(p.TimeSlotsV2,"timeSlots")
+      ...labelsFor(p.Atmospheres,"atmospheres"),
+      ...labelsFor(p.ParkingLevels,"parkingLevels"),
+      ...labelsFor(p.StationDistanceLevels,"stationDistances"),
+      ...labelsFor(p.PartySizes,"partySizes"),...labelsFor(p.TimeSlotsV2,"timeSlots")
     ];
-    if(p.ParkingConvenient===true) chipValues.push("方便停車");
-    if(p.NearStation===true) chipValues.push("離車站近");
     const chipBox=node.querySelector(".chips");
     chipValues.forEach(label=>{const span=document.createElement("span");span.className="chip";span.textContent=label;chipBox.appendChild(span);});
     const note=node.querySelector(".note");

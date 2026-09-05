@@ -1,0 +1,2 @@
+-- P106 V2 intentionally creates no public SQL view.
+-- Public sharing uses P106SearchPublicPlaces() so private columns are never projected to other users.

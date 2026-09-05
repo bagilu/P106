@@ -1,0 +1,1 @@
+P106 V2 keeps AI disabled. No OpenAI key or Edge Function is required.

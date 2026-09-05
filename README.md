@@ -1,144 +1,61 @@
-# P106 現在要去哪裡｜NowWhere V1.1 Auth Personal Edition
+# P106 現在要去哪裡｜NowWhere V2.1 Parking & Station Ranges Candidate
 
-## 1. 專案定位
+## 定位
+P106 是情境式生活經驗喚回系統。V2 將新增流程改成「未來真的會拿來查詢的條件」，並加入私人／公開兩種可見性。
 
-P106「現在要去哪裡」是個人化生活經驗喚回系統（Personal Experience Retrieval System）。它的核心不是取代 Google Maps，也不是大眾推薦平台，而是協助使用者在「現在要決定去哪裡」時，喚回自己曾經看過、聽過、心動過、親友提過、但平常容易忘記的吃喝玩樂地點。
+## V2 核心欄位
+- 食／住／景：可複選
+- 名稱：文字，支援模糊查詢
+- 大致預算：8 個級距，可複選
+- 地點：國家＋第二層行政區；台灣為預設
+- 氣氛：奢華、高雅、文青、簡陋、喧嘩、安靜，可複選
+- 停車：方便／普通／不方便，可複選
+- 距離車站：近／普通／遠，可複選
+- 適合人數：1、2、3–4、5–8、9+，可複選
+- 適合時段：05–08、08–11、11–14、14–17、17–21、21–05，可複選
+- 私人備註：選填
+- 是否公開：預設不公開
 
-本版已由無登入原型升級為登入個人版。每位使用者使用 Email + Password 登入後，只能讀寫自己的地點、感受、同行者與今日候選。
+## 公開資料的安全模型
+`IsPublic = false`：只有擁有者登入後可讀寫。
 
-## 2. 版本資訊
+`IsPublic = true`：其他已登入 P106 的使用者可透過 `P106SearchPublicPlaces()` 查詢安全欄位。
 
-- 專案編號：P106
-- 中文名稱：現在要去哪裡
-- 英文標題：NowWhere / Personal Experience Retrieval System
-- 版本：V1.1 Auth Personal Edition
-- 前端：GitHub Pages 靜態網站
-- 後端：Supabase Database + Supabase Auth
-- AI：本版暫停 AI 功能，不需要 OpenAI API key
-- ZIP 命名：ASCII safe，避免中文 ZIP 檔名造成解壓縮異常
+**不直接建立 `IsPublic=true` 的 base-table SELECT policy。**
+這樣可避免把 `UserId`、`PersonalNote` 等私人欄位一併暴露給其他使用者。
 
-## 3. 風格
+V2 公開查詢不提供：
+- UserId
+- Email
+- PersonalNote
+- 其他舊版私人欄位
 
-本版採「日式文青系 × 台灣公共服務風」：
+## 查詢分流
+「現在要去哪裡」頁面分為：
+1. 我的地點
+2. 公開地點
 
-- 米白、綠、灰藍等柔和色系
-- 卡片式資訊呈現
-- 介面語言偏生活化
-- 功能結構偏公共服務清楚導引
-- 不使用過度科技感或遊戲化視覺
+基本條件（類型、名稱、預算、地點）負責篩選；氣氛、交通、人數與時段作為偏好排序。
 
-## 4. 核心功能
+## 舊資料
+V2 migration 採 additive migration，不刪除 V1.1.1 舊資料與舊欄位。既有地點的 V2 新欄位會先是預設值，之後可逐筆編輯補上。
 
-### 4.1 Email + Password 登入
+## 部署
+既有 P106 V1.1.1：
+1. 備份資料庫。
+2. 執行 `Database/Migrations/P106_V2_0_Migration.sql`。
+3. 更新 `index.html`、`css/style.css`、`js/app.js`。
+4. **保留線上既有 `config.js`，ZIP 內不提供正式 config.js。**
+5. Supabase Auth URL Configuration 設定正確的 GitHub Pages URL。
+6. 用 A/B 兩帳號做 RLS 與公開分享測試。
 
-- 註冊帳號
-- 登入
-- 登出
-- 顯示目前登入者 email
-- 未登入時無法使用主要功能
+## AI
+V2 仍不啟用 AI，不需要 OpenAI API key 或 Edge Function。
 
-### 4.2 現在要去哪裡
+## 版本狀態
+本 ZIP 是 **V2.0 Candidate**。需在實際 Supabase 與 GitHub Pages 上完成 A/B 帳號驗證後，才建議標記 Stable。
 
-使用者可輸入：
-
-- 目前地區
-- 可用時間
-- 同行者
-- 想做的活動
-- 限制條件
-
-系統會從使用者自己的收藏中找出符合情境的候選地點。
-
-### 4.3 快速記一下
-
-平常看到或聽到某個想去的地方時，可快速記錄：
-
-- 地點名稱
-- 地區
-- 路線／地理觸發
-- 類型
-- 狀態
-- 意願
-- 誰提過
-- 適合時間
-- 什麼時候要想起它
-- 個人備註
-- Google Maps 連結
-- 來源網址
-- 預算、氣氛、停車、預約等輔助資訊
-
-### 4.4 我的收藏
-
-- 搜尋自己的收藏
-- 依狀態篩選
-- 查看地點卡片
-- 編輯收藏
-- 刪除收藏
-- 加入今日候選
-- 開啟 Google Maps
-
-### 4.5 待整理
-
-顯示資料不完整的收藏，例如缺少：
-
-- 地區
-- 觸發條件
-- 個人備註
-
-### 4.6 同行者／親友偏好
-
-可建立：
-
-- 家人
-- 朋友
-- 學生
-- 外賓
-- 其他同行者
-
-並記錄喜好與避免條件，例如看海、甜點、不想排隊、不喜歡太吵。
-
-## 5. 資料分層設計
-
-本版採「個人地點庫」方案。
-
-原本的共同地點概念保留在 `TblP106Places` 這張主表，但每筆地點都加上 `UserId`，因此實際上是每個人的個人地點庫。這可避免不同使用者對同一地點的感受互相污染。
-
-## 6. 主要資料表
-
-- `TblP106Places`：個人地點主檔與個人感受整合表
-- `TblP106Companions`：個人同行者／親友偏好
-- `TblP106Sources`：來源紀錄
-- `TblP106TodayCandidates`：今日候選清單
-- `TblP106UserPlaceNotes`：舊版相容用個人備註表；本版會清空舊個人感受資料
-
-## 7. 安全性修正
-
-本版針對 Supabase linter 警告做以下修正：
-
-1. 移除 P106 舊有匿名全開 RLS policies。
-2. 不再建立 anon 可讀寫的 P106 資料表政策。
-3. P106 個人表改為 authenticated + `UserId = auth.uid()`。
-4. 移除舊版 `P106AddPlace` 與 `P106SearchPlaces` RPC function。
-5. `P106SetUpdatedAt` 使用 `SECURITY INVOKER` 並固定 `search_path`。
-6. 本版暫停 AI Edge Function，避免匿名消耗 AI API 額度。
-
-## 8. 部署檔案
-
-- `index.html`：主畫面
-- `css/style.css`：視覺樣式
-- `js/app.js`：前端邏輯
-- `config.sample.js`：Supabase 設定範本
-- `sql/P106_V1_1_Auth_Personal_schema.sql`：資料庫與 RLS SQL
-- `docs/DEPLOYMENT.md`：部署步驟
-- `docs/SECURITY_NOTES.md`：安全修正說明
-- `functions/AI_DISABLED_IN_V1_1.txt`：AI 暫停說明
-- `CHANGELOG.md`：版本變更紀錄
-- `FILE_MANIFEST.txt`：檔案清單
-
-## 9. 重要限制
-
-- 本版不含 AI 整理功能。
-- 本版不串接 Google Maps API，只保留 Google Maps URL。
-- 本版不做多人共享。
-- 本版不是公開推薦平台；資料以個人登入後私有使用為主。
-- 舊的 `TblP106Places` 資料若沒有 `UserId`，會被保留但不會被任何使用者看見，除非手動指定 owner。
+## V2.1 交通條件更新
+- `ParkingLevels text[]`：CONVENIENT / NORMAL / INCONVENIENT
+- `StationDistanceLevels text[]`：NEAR / NORMAL / FAR
+- 舊 `ParkingConvenient`、`NearStation` 欄位暫時保留，不再由 V2.1 前端使用。
