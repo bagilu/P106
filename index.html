@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>P106 現在要去哪裡｜NowWhere</title>
-  <meta name="description" content="P106 現在要去哪裡：個人化生活經驗喚回系統。" />
+  <title>P106 現在要去哪裡｜NowWhere V2</title>
+  <meta name="description" content="P106 現在要去哪裡：情境式個人地點喚回與公開分享查詢。" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -18,16 +18,16 @@
     </div>
     <div class="auth-status">
       <span id="currentUserLabel">尚未登入</span>
-      <button id="logoutBtn" class="btn ghost hidden">登出</button>
+      <button id="logoutBtn" class="btn ghost hidden" type="button">登出</button>
     </div>
   </header>
 
   <main>
     <section id="authPanel" class="panel auth-panel">
       <div class="panel-title">
-        <p class="eyebrow">登入個人版</p>
-        <h2>請先登入，建立只屬於你的地點記憶</h2>
-        <p>本版使用 Supabase Auth Email + Password。登入後，每位使用者只能讀寫自己的地點、感受、同行者與今日候選。</p>
+        <p class="eyebrow">P106 V2</p>
+        <h2>登入你的地點記憶庫</h2>
+        <p>私人地點只有自己看得到；勾選「公開」的地點，其他已登入 P106 的使用者可以在「公開地點」中查詢。</p>
       </div>
       <div class="auth-grid">
         <form id="loginForm" class="card form-card">
@@ -41,7 +41,7 @@
           <label>Email<input name="email" type="email" required autocomplete="email" /></label>
           <label>Password<input name="password" type="password" required autocomplete="new-password" minlength="6" /></label>
           <button class="btn secondary" type="submit">建立帳號</button>
-          <p class="hint">若 Supabase 專案啟用 Email confirmation，註冊後請先收信驗證。</p>
+          <p class="hint">註冊後若收到確認信，請先完成 Email verification 再登入。</p>
         </form>
       </div>
       <div id="authMessage" class="message"></div>
@@ -49,85 +49,211 @@
 
     <section id="appPanel" class="hidden">
       <nav class="tabs" aria-label="主要功能">
-        <button class="tab active" data-tab="now">現在要去哪裡</button>
-        <button class="tab" data-tab="quick">快速記一下</button>
-        <button class="tab" data-tab="places">我的收藏</button>
-        <button class="tab" data-tab="pending">待整理</button>
-        <button class="tab" data-tab="companions">同行者</button>
+        <button class="tab active" data-tab="now" type="button">現在要去哪裡</button>
+        <button class="tab" data-tab="add" type="button">新增地點</button>
+        <button class="tab" data-tab="mine" type="button">我的地點</button>
       </nav>
 
       <section id="tab-now" class="tab-page active">
         <div class="hero-card">
           <p class="eyebrow">Context Retrieval</p>
-          <h2>現在要去哪裡？</h2>
-          <p>輸入目前所在區域、可用時間、同行者與情境，系統會從你自己的收藏中喚回適合的候選地點。</p>
+          <h2>幫我想起來：現在可以去哪裡？</h2>
+          <p>基本條件負責篩選；氣氛、交通、人數與時段則用來把更符合情境的地點排在前面。</p>
         </div>
-        <form id="searchForm" class="panel form-grid">
-          <label>我現在在哪裡<input name="area" placeholder="例如：花蓮市、台11線、台東、台北中山" /></label>
-          <label>我有多少時間
-            <select name="timeBudget">
-              <option value="">不限</option><option>30分鐘</option><option>1小時</option><option>3小時</option><option>半天</option><option>一天</option>
-            </select>
-          </label>
-          <label>跟誰一起<select id="searchCompanion" name="companion"></select></label>
-          <label>現在想做什麼<input name="activity" placeholder="吃飯、咖啡、看海、散步、展覽" /></label>
-          <label class="wide">限制條件<input name="limits" placeholder="雨天、要停車、不想排隊、不要太貴" /></label>
-          <div class="wide actions"><button class="btn primary" type="submit">喚回候選地點</button><button id="clearSearchBtn" class="btn ghost" type="button">清除</button></div>
+
+        <div class="scope-switch" role="group" aria-label="查詢資料來源">
+          <button id="scopeMineBtn" class="scope-btn active" type="button">
+            <strong>我的地點</strong><span>只搜尋自己建立的資料</span>
+          </button>
+          <button id="scopePublicBtn" class="scope-btn" type="button">
+            <strong>公開地點</strong><span>搜尋其他使用者公開分享的資料</span>
+          </button>
+        </div>
+
+        <form id="searchForm" class="panel">
+          <div class="field-block">
+            <span class="field-title">食／住／景</span>
+            <div id="searchCategories" class="choice-grid compact"></div>
+          </div>
+
+          <div class="form-grid">
+            <label>名稱關鍵字
+              <input name="NameKeyword" placeholder="可模糊查詢，例如：咖啡、溫泉、海" />
+            </label>
+            <label>國家
+              <select id="searchCountry" name="CountryCode"></select>
+            </label>
+            <label id="searchRegionSelectWrap">地區
+              <select id="searchRegion" name="RegionText"></select>
+            </label>
+            <label id="searchRegionTextWrap" class="hidden">地區
+              <input id="searchRegionText" placeholder="輸入地區名稱" />
+            </label>
+          </div>
+
+          <div class="field-block">
+            <span class="field-title">大致預算</span>
+            <div id="searchBudgets" class="choice-grid"></div>
+          </div>
+
+          <div class="field-block">
+            <span class="field-title">氣氛</span>
+            <div id="searchAtmospheres" class="choice-grid"></div>
+          </div>
+
+          <div class="form-grid">
+            <label>方便停車
+              <select name="ParkingConvenient">
+                <option value="">不限</option><option value="true">是</option><option value="false">否</option>
+              </select>
+            </label>
+            <label>離車站近
+              <select name="NearStation">
+                <option value="">不限</option><option value="true">是</option><option value="false">否</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="field-block">
+            <span class="field-title">適合人數</span>
+            <div id="searchPartySizes" class="choice-grid"></div>
+          </div>
+
+          <div class="field-block">
+            <div class="field-title-line">
+              <span class="field-title">適合時段</span>
+              <button id="useCurrentTimeBtn" class="text-btn" type="button">依現在時間選擇</button>
+            </div>
+            <div id="searchTimeSlots" class="choice-grid"></div>
+          </div>
+
+          <div class="actions">
+            <button class="btn primary" type="submit">幫我想起來</button>
+            <button id="clearSearchBtn" class="btn ghost" type="button">清除條件</button>
+          </div>
         </form>
+
+        <div class="results-heading">
+          <div>
+            <p class="eyebrow" id="resultEyebrow">My Memory</p>
+            <h2 id="resultTitle">我的地點</h2>
+          </div>
+          <span id="resultCount" class="count-badge">0 筆</span>
+        </div>
         <div id="searchResults" class="result-grid"></div>
       </section>
 
-      <section id="tab-quick" class="tab-page">
+      <section id="tab-add" class="tab-page">
         <div class="panel-title">
-          <p class="eyebrow">Capture</p>
-          <h2>快速記一下</h2>
-          <p>看到、聽到、想到一個地方時，不必完整填表；先記下未來什麼情境下該想起它。</p>
+          <p class="eyebrow">Quick Capture</p>
+          <h2 id="addPageTitle">新增地點</h2>
+          <p>只記錄未來真的會拿來查詢的資訊。大多數欄位只要點選標籤即可。</p>
         </div>
-        <form id="quickForm" class="panel form-grid">
-          <label>地點名稱<input name="PlaceName" required placeholder="例如：某某咖啡、200K附近海灘" /></label>
-          <label>地區<input name="AreaText" placeholder="例如：花蓮市、台11線、台東" /></label>
-          <label>路線／地理觸發<input name="RouteTag" placeholder="例如：台11線、花蓮到台東途中" /></label>
-          <label>類型<select name="PlaceType"><option>餐廳</option><option>咖啡</option><option>甜點</option><option>景點</option><option>展覽</option><option>活動</option><option>伴手禮</option><option>其他</option></select></label>
-          <label>狀態<select name="VisitStatus"><option>未去</option><option>已去</option><option>想再去</option><option>不推薦</option><option>待確認</option></select></label>
-          <label>意願<select name="DesireLevel"><option>很想去</option><option>普通</option><option>待確認</option></select></label>
-          <label>誰提過<select id="quickCompanion" name="MentionedByCompanionId"></select></label>
-          <label>適合時間<input name="TimeTags" placeholder="例如：3小時、半天、下午、雨天" /></label>
-          <label class="wide">什麼時候要想起它<input name="TriggerTags" placeholder="例如：到附近、有空檔、帶家人、台11線順路" /></label>
-          <label class="wide">為什麼想去／個人備註<textarea name="PersonalNote" rows="3" placeholder="朋友說甜點很好；下次去台東可順路；適合看海。"></textarea></label>
-          <label>Google Maps 連結<input name="GoogleMapsUrl" type="url" placeholder="https://maps.google.com/..." /></label>
-          <label>來源網址<input name="SourceUrl" type="url" placeholder="部落格、貼文、官方網站" /></label>
-          <label>預算<input name="BudgetLevel" placeholder="低、中、高、未知" /></label>
-          <label>氣氛<input name="MoodTags" placeholder="安靜、文青、親子、正式" /></label>
-          <label>停車<input name="ParkingNote" placeholder="好停車、難停車、未知" /></label>
-          <label>預約<input name="ReservationNote" placeholder="需預約、常排隊、未知" /></label>
-          <div class="wide actions"><button class="btn primary" type="submit">儲存到我的收藏</button><button class="btn ghost" type="reset">清空</button></div>
+
+        <form id="placeForm" class="panel">
+          <input id="editingPlaceId" type="hidden" />
+
+          <div class="field-block required-block">
+            <span class="field-title">1. 食／住／景 <small>可複選</small></span>
+            <div id="placeCategories" class="choice-grid compact"></div>
+          </div>
+
+          <div class="form-grid">
+            <label>2. 名稱
+              <input name="PlaceName" required maxlength="160" placeholder="例如：七星潭某咖啡店" />
+            </label>
+          </div>
+
+          <div class="field-block">
+            <span class="field-title">3. 大致預算 <small>可複選</small></span>
+            <div id="placeBudgets" class="choice-grid"></div>
+          </div>
+
+          <div class="form-grid">
+            <label>4. 國家
+              <select id="placeCountry" name="CountryCode"></select>
+            </label>
+            <label id="placeRegionSelectWrap">地區
+              <select id="placeRegion" name="RegionText"></select>
+            </label>
+            <label id="placeRegionTextWrap" class="hidden">地區
+              <input id="placeRegionText" placeholder="輸入地區名稱" />
+            </label>
+          </div>
+
+          <div class="field-block">
+            <span class="field-title">5. 氣氛 <small>可複選</small></span>
+            <div id="placeAtmospheres" class="choice-grid"></div>
+          </div>
+
+          <div class="form-grid">
+            <label>6. 方便停車
+              <select name="ParkingConvenient">
+                <option value="">不知道</option><option value="true">是</option><option value="false">否</option>
+              </select>
+            </label>
+            <label>6. 離車站近
+              <select name="NearStation">
+                <option value="">不知道</option><option value="true">是</option><option value="false">否</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="field-block">
+            <span class="field-title">7. 適合人數 <small>可複選</small></span>
+            <div id="placePartySizes" class="choice-grid"></div>
+          </div>
+
+          <div class="field-block">
+            <span class="field-title">8. 適合時段 <small>可複選</small></span>
+            <div id="placeTimeSlots" class="choice-grid"></div>
+          </div>
+
+          <div class="form-grid">
+            <label class="wide">備註 <small>選填，只供自己查看</small>
+              <textarea name="PersonalNote" rows="3" maxlength="1200" placeholder="例如：朋友推薦、下雨天可能不適合、想帶家人去。"></textarea>
+            </label>
+            <label class="wide">Google Maps 連結 <small>選填</small>
+              <input name="GoogleMapsUrl" type="url" maxlength="1000" placeholder="https://maps.google.com/..." />
+            </label>
+          </div>
+
+          <div class="privacy-card">
+            <label class="privacy-toggle">
+              <input name="IsPublic" type="checkbox" value="true" />
+              <span>
+                <strong>公開這個地點</strong>
+                <small>開啟後，其他已登入 P106 的使用者可以查到「可分享的地點條件」；你的私人備註與帳號識別資訊不會公開。</small>
+              </span>
+            </label>
+          </div>
+
+          <div class="actions">
+            <button id="savePlaceBtn" class="btn primary" type="submit">儲存地點</button>
+            <button id="resetPlaceBtn" class="btn ghost" type="button">清空</button>
+            <button id="cancelEditBtn" class="btn ghost hidden" type="button">取消編輯</button>
+          </div>
         </form>
       </section>
 
-      <section id="tab-places" class="tab-page">
+      <section id="tab-mine" class="tab-page">
         <div class="toolbar">
-          <div><p class="eyebrow">My Memory</p><h2>我的收藏</h2></div>
-          <div class="filter-line"><input id="placeKeyword" placeholder="搜尋名稱、地區、備註、觸發條件" /><select id="statusFilter"><option value="">全部狀態</option><option>未去</option><option>已去</option><option>想再去</option><option>不推薦</option><option>待確認</option></select><button id="reloadBtn" class="btn ghost">重新整理</button></div>
+          <div>
+            <p class="eyebrow">My Places</p>
+            <h2>我的地點</h2>
+            <p class="muted">私人與公開地點都在這裡管理；公開狀態可隨時修改。</p>
+          </div>
+          <div class="filter-line">
+            <input id="mineKeyword" placeholder="搜尋名稱或地區" />
+            <select id="visibilityFilter">
+              <option value="">全部</option>
+              <option value="private">只看私人</option>
+              <option value="public">只看公開</option>
+            </select>
+            <button id="reloadBtn" class="btn ghost" type="button">重新整理</button>
+          </div>
         </div>
-        <div id="placesList" class="result-grid"></div>
-      </section>
-
-      <section id="tab-pending" class="tab-page">
-        <div class="panel-title"><p class="eyebrow">Inbox</p><h2>待整理</h2><p>顯示缺少地區、觸發條件或個人備註的收藏。這些資料先保留，之後再補完即可。</p></div>
-        <div id="pendingList" class="result-grid"></div>
-      </section>
-
-      <section id="tab-companions" class="tab-page">
-        <div class="panel-title"><p class="eyebrow">People</p><h2>同行者／親友偏好</h2><p>記錄「誰提過哪裡」與同行者偏好。這些資料只屬於目前登入者。</p></div>
-        <form id="companionForm" class="panel form-grid">
-          <label>名稱<input name="CompanionName" required placeholder="例如：媽媽、朋友A、外賓、學生" /></label>
-          <label>關係／分類<input name="RelationLabel" placeholder="家人、朋友、學生、同事" /></label>
-          <label class="wide">喜好標籤<input name="PreferenceTags" placeholder="看海、甜點、咖啡、拍照、安靜" /></label>
-          <label class="wide">避免條件<input name="AvoidanceTags" placeholder="不吃辣、不想排隊、不喜歡太吵、不走太遠" /></label>
-          <label class="wide">備註<textarea name="Notes" rows="2"></textarea></label>
-          <div class="wide actions"><button class="btn secondary" type="submit">新增同行者</button></div>
-        </form>
-        <div id="companionsList" class="people-list"></div>
+        <div id="mineList" class="result-grid"></div>
       </section>
     </section>
   </main>
@@ -136,35 +262,23 @@
 
   <template id="placeCardTemplate">
     <article class="card place-card">
-      <div class="card-head"><h3></h3><span class="badge"></span></div>
-      <p class="meta"></p>
-      <p class="note"></p>
+      <div class="card-head">
+        <div>
+          <h3></h3>
+          <p class="meta"></p>
+        </div>
+        <span class="badge visibility-badge"></span>
+      </div>
       <div class="chips"></div>
+      <p class="note"></p>
+      <div class="match-line hidden"></div>
       <div class="card-actions">
-        <a class="btn tiny maps-link" target="_blank" rel="noopener">Google Maps</a>
-        <button class="btn tiny secondary candidate-btn">加入今日候選</button>
-        <button class="btn tiny ghost edit-btn">編輯</button>
-        <button class="btn tiny danger delete-btn">刪除</button>
+        <a class="btn tiny maps-link hidden" target="_blank" rel="noopener">Google Maps</a>
+        <button class="btn tiny ghost edit-btn" type="button">編輯</button>
+        <button class="btn tiny danger delete-btn" type="button">刪除</button>
       </div>
     </article>
   </template>
-
-  <dialog id="editDialog">
-    <form id="editForm" class="dialog-form" method="dialog">
-      <h3>編輯收藏</h3>
-      <input type="hidden" name="PlaceId" />
-      <label>地點名稱<input name="PlaceName" required /></label>
-      <label>地區<input name="AreaText" /></label>
-      <label>路線／觸發<input name="RouteTag" /></label>
-      <label>類型<input name="PlaceType" /></label>
-      <label>狀態<input name="VisitStatus" /></label>
-      <label>意願<input name="DesireLevel" /></label>
-      <label>什麼時候要想起它<input name="TriggerTags" /></label>
-      <label>個人備註<textarea name="PersonalNote" rows="3"></textarea></label>
-      <label>Google Maps<input name="GoogleMapsUrl" type="url" /></label>
-      <div class="actions"><button class="btn primary" value="save">儲存</button><button class="btn ghost" value="cancel">取消</button></div>
-    </form>
-  </dialog>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
