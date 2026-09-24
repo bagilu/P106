@@ -50,3 +50,60 @@ textarea{resize:vertical}input:focus,select:focus,textarea:focus{border-color:va
   .site-header{padding:14px 18px;align-items:flex-start}.brand h1{font-size:1.15rem}
   .auth-grid,.form-grid,.result-grid,.scope-switch{grid-template-columns:1fr}.toolbar,.results-heading{display:block}.filter-line input{min-width:0}.wide{grid-column:auto}
 }
+
+
+/* P106 V2.2 — SBI-P-SDS v3.1 Auth compliance */
+.auth-single{
+  display:grid;
+  grid-template-columns:minmax(0,1.05fr) minmax(280px,.95fr);
+  gap:18px;
+  align-items:stretch;
+}
+.auth-single .form-card,.auth-explain{padding:22px}
+.auth-single h3{margin-top:0}
+.auth-single h3 small{color:var(--muted);font-weight:500}
+.password-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+.password-toggle{
+  border:1px solid #cfd9d0;
+  background:#fff;
+  color:var(--blue);
+  border-radius:12px;
+  padding:11px 13px;
+  font:inherit;
+  font-weight:800;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.password-toggle:hover{border-color:var(--blue)}
+.account-links{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px 14px;
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px dashed var(--line);
+}
+.account-links a,.p130-card-link{
+  color:var(--blue);
+  font-weight:800;
+  text-decoration:none;
+}
+.account-links a:hover,.p130-card-link:hover{text-decoration:underline}
+.auth-explain{background:linear-gradient(145deg,#f3f7ef,#f2f5f8)}
+.auth-explain p{line-height:1.7;color:var(--muted)}
+.site-footer{
+  width:min(1180px,94vw);
+  margin:0 auto 28px;
+  padding:18px 12px 24px;
+  text-align:center;
+  color:var(--muted);
+  border-top:1px solid var(--line);
+  font-size:.92rem;
+}
+.site-footer a{color:var(--green);font-weight:900;text-decoration:none}
+.site-footer a:hover{text-decoration:underline}
+@media(max-width:900px){
+  .auth-single{grid-template-columns:1fr}
+  .password-row{grid-template-columns:1fr}
+  .password-toggle{width:100%}
+}
