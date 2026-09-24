@@ -5,7 +5,7 @@ const supabaseReady = cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY && !String(cfg.S
 const db = supabaseReady ? window.supabase.createClient(
   cfg.SUPABASE_URL,
   cfg.SUPABASE_ANON_KEY,
-  { auth: { storageKey: "p106-auth-token", persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
+  { auth: { storageKey: "P106-auth", persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
 ) : null;
 
 const DEFINITIONS = {
@@ -47,7 +47,7 @@ function showToast(message, isError=false){
 }
 function setMessage(message){ $("authMessage").textContent = message || ""; }
 function ensureDb(){
-  if(!db){ showToast("請保留既有 config.js，或由 config.sample.js 建立 config.js 並填入 Supabase 設定。", true); return false; }
+  if(!db){ showToast("請保留既有 config.js，或由 config-sample.js 建立 config.js 並填入 Supabase 設定。", true); return false; }
   return true;
 }
 function escapeHtml(value){
@@ -125,10 +125,10 @@ async function init(){
 }
 function renderAuthState(){
   if(currentUser){
-    $("authPanel").classList.add("hidden"); $("appPanel").classList.remove("hidden"); $("logoutBtn").classList.remove("hidden");
+    $("authPanel").classList.add("hidden"); $("appPanel").classList.remove("hidden"); $("logoutBtn").classList.remove("hidden"); $("accountCenterBtn").classList.remove("hidden");
     $("currentUserLabel").textContent = currentUser.email || "已登入";
   }else{
-    $("authPanel").classList.remove("hidden"); $("appPanel").classList.add("hidden"); $("logoutBtn").classList.add("hidden");
+    $("authPanel").classList.remove("hidden"); $("appPanel").classList.add("hidden"); $("logoutBtn").classList.add("hidden"); $("accountCenterBtn").classList.add("hidden");
     $("currentUserLabel").textContent = "尚未登入";
     myPlaces=[]; publicPlaces=[];
   }
@@ -150,16 +150,19 @@ function bindUI(){
     else { form.reset(); setMessage("登入成功"); }
   });
 
-  $("signupForm").addEventListener("submit", async e=>{
-    e.preventDefault(); const form=e.currentTarget; const data=Object.fromEntries(new FormData(form));
-    setMessage("建立帳號中…");
-    const redirect = window.location.origin + window.location.pathname;
-    const { error } = await db.auth.signUp({email:data.email,password:data.password,options:{emailRedirectTo:redirect}});
-    if(error){ setMessage(error.message); showToast("註冊失敗",true); }
-    else { form.reset(); setMessage("帳號已建立。請到信箱完成確認後再登入。"); showToast("註冊完成"); }
+
+  $("logoutBtn").addEventListener("click", async()=>{
+    const { error } = await db.auth.signOut({ scope: "local" });
+    if(error) showToast("登出失敗："+error.message,true);
   });
 
-  $("logoutBtn").addEventListener("click",()=>db.auth.signOut());
+  $("togglePasswordBtn").addEventListener("click",()=>{
+    const input=$("loginPassword");
+    const show=input.type==="password";
+    input.type=show?"text":"password";
+    $("togglePasswordBtn").textContent=show?"隱藏密碼":"顯示密碼";
+    $("togglePasswordBtn").setAttribute("aria-pressed",show?"true":"false");
+  });
   $("placeForm").addEventListener("submit", savePlace);
   $("resetPlaceBtn").addEventListener("click", resetPlaceForm);
   $("cancelEditBtn").addEventListener("click", resetPlaceForm);
