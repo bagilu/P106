@@ -18,6 +18,7 @@
     </div>
     <div class="auth-status">
       <span id="currentUserLabel">尚未登入</span>
+      <a id="accountCenterBtn" class="btn ghost hidden" href="https://bagilu.github.io/P130/" target="_blank" rel="noopener">帳號設定</a>
       <button id="logoutBtn" class="btn ghost hidden" type="button">登出</button>
     </div>
   </header>
@@ -25,26 +26,41 @@
   <main>
     <section id="authPanel" class="panel auth-panel">
       <div class="panel-title">
-        <p class="eyebrow">P106 V2</p>
-        <h2>登入你的地點記憶庫</h2>
-        <p>私人地點只有自己看得到；勾選「公開」的地點，其他已登入 P106 的使用者可以在「公開地點」中查詢。</p>
+        <p class="eyebrow">P106 · Shared Auth</p>
+        <h2>登入 P106「現在要去哪裡」</h2>
+        <p>使用好玩實驗室 P 系列共用帳號登入。P106 只處理登入與本專案資料；註冊、密碼與帳號資料統一由 P130 帳號中心管理。</p>
       </div>
-      <div class="auth-grid">
+
+      <div class="auth-single">
         <form id="loginForm" class="card form-card">
-          <h3>登入</h3>
-          <label>Email<input name="email" type="email" required autocomplete="email" /></label>
-          <label>Password<input name="password" type="password" required autocomplete="current-password" minlength="6" /></label>
-          <button class="btn primary" type="submit">登入</button>
+          <h3>登入 <small>Sign in</small></h3>
+          <label>Email
+            <input name="email" type="email" required autocomplete="email" />
+          </label>
+          <label>密碼 <small>Password</small>
+            <div class="password-row">
+              <input id="loginPassword" name="password" type="password" required autocomplete="current-password" minlength="8" />
+              <button id="togglePasswordBtn" class="password-toggle" type="button" aria-pressed="false">顯示密碼</button>
+            </div>
+          </label>
+          <button class="btn primary" type="submit">登入 P106</button>
+          <div class="account-links" aria-label="帳號管理">
+            <a href="https://bagilu.github.io/P130/" target="_blank" rel="noopener">還沒有帳號？到 P130 註冊</a>
+            <a href="https://bagilu.github.io/P130/forgot-password.html" target="_blank" rel="noopener">忘記密碼？到 P130 處理</a>
+            <a href="https://bagilu.github.io/P130/" target="_blank" rel="noopener">帳號設定 → P130</a>
+          </div>
+          <p class="hint">P106 不另外建立帳號，也不在本站修改共用 Auth 密碼。</p>
         </form>
-        <form id="signupForm" class="card form-card">
-          <h3>註冊</h3>
-          <label>Email<input name="email" type="email" required autocomplete="email" /></label>
-          <label>Password<input name="password" type="password" required autocomplete="new-password" minlength="6" /></label>
-          <button class="btn secondary" type="submit">建立帳號</button>
-          <p class="hint">註冊後若收到確認信，請先完成 Email verification 再登入。</p>
-        </form>
+
+        <aside class="auth-explain card">
+          <p class="eyebrow">SBI-P-SDS v3.1</p>
+          <h3>帳號共用，權限分開</h3>
+          <p>同一個 Email 可登入採用 shared Supabase Auth 的 P 系列專案；P106 的私人地點、公開分享與資料權限仍由 P106 自己的 RLS 控制。</p>
+          <a class="p130-card-link" href="https://bagilu.github.io/P130/" target="_blank" rel="noopener">前往 P130 Account Center →</a>
+        </aside>
       </div>
-      <div id="authMessage" class="message"></div>
+
+      <div id="authMessage" class="message" role="status"></div>
     </section>
 
     <section id="appPanel" class="hidden">
@@ -251,6 +267,12 @@
       </section>
     </section>
   </main>
+
+  <footer class="site-footer">
+    慈濟大學　經營管理學系　
+    <a href="https://tcubmdsbilab.github.io/P101/" target="_blank" rel="noopener">好玩實驗室</a>
+    　作品
+  </footer>
 
   <div id="toast" class="toast hidden"></div>
 
