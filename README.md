@@ -42,20 +42,19 @@ V2.300 introduces:
 5. P101 central registration SQL and read-only verification SQL are included.
 6. RPC-only migration and RPC-only frontend are prepared.
 
-## Important deployment state
-The production page has received all **non-breaking frontend v3.7 changes**.
+## Deployment state
+P106 V2.300 is now running the **SBI-P-SDS v3.7 RPC-only frontend**.
 
-The RPC-only database transition is intentionally staged:
-- Migration: `Database/Migrations/P106_V2_300_SDS37_RPC_Only.sql`
-- Ready frontend: `js/app.rpc-v37.js`
+Completed:
+- `Database/Migrations/P106_V2_300_SDS37_RPC_Only.sql` executed successfully.
+- P101 central analytics registration SQL executed successfully.
+- Production `js/app.js` has been switched to the RPC-only implementation.
+- Direct frontend `.from()` table CRUD has been removed.
 
-The current active `js/app.js` must not be replaced by `app.rpc-v37.js` until the Supabase migration has been executed successfully. This sequencing prevents a production outage.
-
-After the migration succeeds:
-1. replace active `js/app.js` with the contents of `js/app.rpc-v37.js`;
-2. run `Database/99_P106_HealthCheck.sql`;
-3. verify direct table grants are absent;
-4. perform A/B account allow/deny tests.
+Remaining validation:
+1. run `Database/99_P106_HealthCheck.sql`;
+2. perform A/B account allow/deny tests;
+3. confirm P101 analytics events appear in the P101 admin dashboard.
 
 ## P101 centralized analytics
 The public homepage loads:
