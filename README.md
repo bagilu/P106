@@ -1,61 +1,82 @@
-# P106 現在要去哪裡｜NowWhere V2.1 Parking & Station Ranges Candidate
+# P106 現在要去哪裡｜NowWhere
 
-## 定位
-P106 是情境式生活經驗喚回系統。V2 將新增流程改成「未來真的會拿來查詢的條件」，並加入私人／公開兩種可見性。
+## Current Web Version
+- Web Version: **V2.300**
+- SDS target: **SBI-P-SDS v3.7**
+- Frontend: GitHub Pages
+- Backend: shared Supabase Auth + PostgreSQL
+- Account lifecycle: P130 Account Center
+- AI: disabled
 
-## V2 核心欄位
+## Project purpose
+P106 is a context-based personal place retrieval system. Users record places they want to remember and later retrieve them by category, budget, location, atmosphere, parking, station distance, party size, and time slot.
+
+## V2 core fields
 - 食／住／景：可複選
-- 名稱：文字，支援模糊查詢
-- 大致預算：8 個級距，可複選
-- 地點：國家＋第二層行政區；台灣為預設
-- 氣氛：奢華、高雅、文青、簡陋、喧嘩、安靜，可複選
-- 停車：方便／普通／不方便，可複選
-- 距離車站：近／普通／遠，可複選
-- 適合人數：1、2、3–4、5–8、9+，可複選
-- 適合時段：05–08、08–11、11–14、14–17、17–21、21–05，可複選
-- 私人備註：選填
-- 是否公開：預設不公開
+- 名稱：文字
+- 大致預算：8 個級距
+- 國家＋第二層行政區
+- 氣氛
+- 停車：方便／普通／不方便
+- 距離車站：近／普通／遠
+- 適合人數
+- 適合時段
+- 私人備註
+- 是否公開
 
-## 公開資料的安全模型
-`IsPublic = false`：只有擁有者登入後可讀寫。
+## Auth
+P106 retains its own Email + Password sign-in page and uses shared Supabase Auth.
+Registration, Email verification, forgot/reset/change password, account profile, and cross-project account administration are handled by P130.
 
-`IsPublic = true`：其他已登入 P106 的使用者可透過 `P106SearchPublicPlaces()` 查詢安全欄位。
+Project auth storageKey:
+`P106-auth`
 
-**不直接建立 `IsPublic=true` 的 base-table SELECT policy。**
-這樣可避免把 `UserId`、`PersonalNote` 等私人欄位一併暴露給其他使用者。
+## SBI-P-SDS v3.7 upgrade
+V2.300 introduces:
+1. Footer identification in required order:
+   `慈濟大學｜經營管理學系｜好玩實驗室 · Web Version V2.300 · SBI-P-SDS v3.7`
+2. Every institutional “好玩實驗室” link points to:
+   `https://tcubmdsbilab.github.io/P101/`
+3. CSS/JS cache busting uses V2.300.
+4. P101 centralized anonymous analytics is loaded once on `index.html` with `data-project="P106"`.
+5. P101 central registration SQL and read-only verification SQL are included.
+6. RPC-only migration and RPC-only frontend are prepared.
 
-V2 公開查詢不提供：
-- UserId
-- Email
-- PersonalNote
-- 其他舊版私人欄位
+## Important deployment state
+The production page has received all **non-breaking frontend v3.7 changes**.
 
-## 查詢分流
-「現在要去哪裡」頁面分為：
-1. 我的地點
-2. 公開地點
+The RPC-only database transition is intentionally staged:
+- Migration: `Database/Migrations/P106_V2_300_SDS37_RPC_Only.sql`
+- Ready frontend: `js/app.rpc-v37.js`
 
-基本條件（類型、名稱、預算、地點）負責篩選；氣氛、交通、人數與時段作為偏好排序。
+The current active `js/app.js` must not be replaced by `app.rpc-v37.js` until the Supabase migration has been executed successfully. This sequencing prevents a production outage.
 
-## 舊資料
-V2 migration 採 additive migration，不刪除 V1.1.1 舊資料與舊欄位。既有地點的 V2 新欄位會先是預設值，之後可逐筆編輯補上。
+After the migration succeeds:
+1. replace active `js/app.js` with the contents of `js/app.rpc-v37.js`;
+2. run `Database/99_P106_HealthCheck.sql`;
+3. verify direct table grants are absent;
+4. perform A/B account allow/deny tests.
 
-## 部署
-既有 P106 V1.1.1：
-1. 備份資料庫。
-2. 執行 `Database/Migrations/P106_V2_0_Migration.sql`。
-3. 更新 `index.html`、`css/style.css`、`js/app.js`。
-4. **保留線上既有 `config.js`，ZIP 內不提供正式 config.js。**
-5. Supabase Auth URL Configuration 設定正確的 GitHub Pages URL。
-6. 用 A/B 兩帳號做 RLS 與公開分享測試。
+## P101 centralized analytics
+The public homepage loads:
+`https://tcubmdsbilab.github.io/P101/analytics/v0.1/analytics.js`
 
-## AI
-V2 仍不啟用 AI，不需要 OpenAI API key 或 Edge Function。
+Project Code:
+`P106`
 
-## 版本狀態
-本 ZIP 是 **V2.0 Candidate**。需在實際 Supabase 與 GitHub Pages 上完成 A/B 帳號驗證後，才建議標記 Stable。
+Central registration files:
+- `Database/P106_P101_Analytics_Register.sql`
+- `Database/P106_P101_Analytics_Verify.sql`
 
-## V2.1 交通條件更新
-- `ParkingLevels text[]`：CONVENIENT / NORMAL / INCONVENIENT
-- `StationDistanceLevels text[]`：NEAR / NORMAL / FAR
-- 舊 `ParkingConvenient`、`NearStation` 欄位暫時保留，不再由 V2.1 前端使用。
+The registration SQL is a controlled P101 platform governance operation. It must be executed by an authorized P101 administrator and is not part of the P106 automatic migration.
+
+## Security
+- RLS remains required.
+- No service-role key is placed in public frontend code.
+- Production `config.js` contains only public Supabase connection settings.
+- Release templates use `config-sample.js`.
+- P106 database changes are project-scoped.
+- Public place search does not return `UserId` or `PersonalNote`.
+
+## Footer
+The homepage footer contains the institutional identification, Web Version and SDS version. “好玩實驗室” links back to P101.
