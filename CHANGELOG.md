@@ -1,5 +1,19 @@
 # P106 NowWhere Changelog
 
+## V2.300 — SBI-P-SDS v3.7 staged migration — 2026-11-10
+- Added Web Version V2.300 and cache busting.
+- Updated visible SDS label to SBI-P-SDS v3.7.
+- Standardized homepage footer institution → Web Version → SDS order.
+- Confirmed institutional 好玩實驗室 link points to P101.
+- Added P101 centralized analytics loader with data-project=P106.
+- Added analytics/privacy notice.
+- Added P101 central analytics registration and verification SQL.
+- Added P106 v3.7 RPC-only migration.
+- Added ready-to-activate RPC-only frontend at js/app.rpc-v37.js.
+- Updated Permissions and HealthCheck SQL for direct-table-access revocation and RPC least privilege.
+- Production app.js intentionally remains active until the RPC migration is executed, preventing a live outage.
+
+
 ## V2.1 Parking & Station Ranges Candidate — 2026-09-05
 - Fixed PostgreSQL 42P13 when changing `P106SearchPublicPlaces()` RETURNS TABLE signature by dropping the old P106 function before recreation.
 - Parking changed from boolean to multi-select: 方便／普通／不方便.
