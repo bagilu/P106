@@ -8,10 +8,10 @@ Date: 2026-11-10
 | QA | Status | Result |
 |---|---|---|
 | QA-01 RLS Always On | REVIEW | Existing P106 table SQL enables/forces RLS; live catalog check required. |
-| QA-02 No direct Table/View CRUD | REVIEW | RPC-only frontend prepared as js/app.rpc-v37.js; activation waits for DB migration to avoid outage. |
-| QA-03 RPC Only | REVIEW | Required RPC migration prepared; live SQL execution required before activation. |
+| QA-02 No direct Table/View CRUD | PASS | Production app.js now uses P106 RPCs only; no direct table CRUD remains. |
+| QA-03 RPC Only | PASS | P106 RPC-only migration executed successfully and production frontend activated. |
 | QA-04 Exposed Schemas | REVIEW | Must be checked in Supabase Dashboard / Data API settings. |
-| QA-05 Least table grants | REVIEW | v3.7 migration revokes anon/authenticated direct table access; live catalog check required. |
+| QA-05 Least table grants | REVIEW | Migration executed; catalog verification via 99_P106_HealthCheck.sql still required. |
 | QA-06 RLS policies | REVIEW | A/B allow/deny testing required after migration. |
 | QA-07 Least Data | PASS | My-list and public-list RPCs return explicit fields; public RPC omits UserId and PersonalNote. |
 | QA-08 PUBLIC EXECUTE | PASS in migration | Migration revokes PUBLIC/anon execution and grants authenticated only. |
@@ -26,6 +26,6 @@ Date: 2026-11-10
 | QA-25 P101 analytics loader | PASS | Single homepage analytics loader uses data-project=P106. |
 | QA-26 analytics E2E | REVIEW | Must verify in P101 admin dashboard. |
 | QA-27 analytics platform protections | N/A | P101 platform governance responsibility. |
-| QA-28 P101 registration SQL | PASS delivery | Registration + read-only verification SQL included; authorized execution still required. |
+| QA-28 P101 registration SQL | PASS | Registration SQL executed successfully; read-only verification remains available in repository. |
 
 No FAIL is intentionally marked PASS. Items requiring live Supabase or P101 administrative verification remain REVIEW.
