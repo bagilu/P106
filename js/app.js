@@ -191,7 +191,7 @@ async function loadAll(){
   doSearch();
 }
 async function loadMyPlaces(){
-  const { data, error } = await db.from("TblP106Places").select("*").order("UpdatedAt",{ascending:false});
+  const { data, error } = await db.rpc("P106_ListMyPlaces");
   if(error){ showToast("讀取我的地點失敗："+error.message,true); return; }
   myPlaces=data||[];
 }
@@ -228,9 +228,9 @@ async function savePlace(e){
 
   let error;
   if(editingPlaceId){
-    ({error}=await db.from("TblP106Places").update(payload).eq("PlaceId",editingPlaceId));
+    ({error}=await db.rpc("P106_UpdatePlace",{place_id:editingPlaceId,payload}));
   }else{
-    ({error}=await db.from("TblP106Places").insert(payload));
+    ({error}=await db.rpc("P106_CreatePlace",{payload}));
   }
   if(error){ showToast((editingPlaceId?"更新":"儲存")+"失敗："+error.message,true); return; }
   showToast(editingPlaceId?"已更新地點":"已儲存地點");
@@ -262,7 +262,7 @@ function editPlace(placeId){
 }
 async function deletePlace(placeId){
   if(!confirm("確定刪除此筆地點？")) return;
-  const { error }=await db.from("TblP106Places").delete().eq("PlaceId",placeId);
+  const { error }=await db.rpc("P106_DeletePlace",{place_id:placeId});
   if(error){ showToast("刪除失敗："+error.message,true); return; }
   showToast("已刪除"); await loadAll();
 }
