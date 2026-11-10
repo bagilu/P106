@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>P106 現在要去哪裡｜NowWhere V2</title>
+  <title>P106 現在要去哪裡｜NowWhere V2.3</title>
   <meta name="description" content="P106 現在要去哪裡：情境式個人地點喚回與公開分享查詢。" />
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css?v=2.300" />
 </head>
 <body>
   <header class="site-header">
@@ -53,7 +53,7 @@
         </form>
 
         <aside class="auth-explain card">
-          <p class="eyebrow">SBI-P-SDS v3.1</p>
+          <p class="eyebrow">SBI-P-SDS v3.7</p>
           <h3>帳號共用，權限分開</h3>
           <p>同一個 Email 可登入採用 shared Supabase Auth 的 P 系列專案；P106 的私人地點、公開分享與資料權限仍由 P106 自己的 RLS 控制。</p>
           <a class="p130-card-link" href="https://bagilu.github.io/P130/" target="_blank" rel="noopener">前往 P130 Account Center →</a>
@@ -269,9 +269,12 @@
   </main>
 
   <footer class="site-footer">
-    慈濟大學　經營管理學系　
-    <a href="https://tcubmdsbilab.github.io/P101/" target="_blank" rel="noopener">好玩實驗室</a>
-    　作品
+    <div>
+      慈濟大學｜經營管理學系｜
+      <a href="https://tcubmdsbilab.github.io/P101/" target="_blank" rel="noopener">好玩實驗室</a>
+      · Web Version V2.300 · SBI-P-SDS v3.7
+    </div>
+    <div class="analytics-notice">本站載入 P101 共用匿名使用分析；不主動蒐集姓名、Email 或原始 IP，統計用於網站改善。</div>
   </footer>
 
   <div id="toast" class="toast hidden"></div>
@@ -298,6 +301,14 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/app.js?v=2.300"></script>
+
+  <!-- SBI-P-SDS v3.7 · P101 Centralized Web Analytics -->
+  <script
+    defer
+    src="https://tcubmdsbilab.github.io/P101/analytics/v0.1/analytics.js"
+    data-project="P106"
+    data-endpoint="https://mfljkyvdadxlrbxlboce.supabase.co/functions/v1/P101-analytics-ingest">
+  </script>
 </body>
 </html>
